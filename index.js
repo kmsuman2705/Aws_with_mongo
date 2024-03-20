@@ -86,6 +86,32 @@ app.post('/signup', (req, res) => {
         });
 });
 
+// Route to serve login form
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Route to handle login form submission
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    // Find user by username and password
+    User.findOne({ username, password }).exec()
+        .then(user => {
+            if (!user) {
+                // User not found, send error response
+                res.status(404).send('Invalid username or password');
+            } else {
+                // User found, send success response
+                res.status(200).send('Login successful');
+            }
+        })
+        .catch(err => {
+            // Error occurred, send error response
+            console.error('Error logging in:', err);
+            res.status(500).send('Error logging in');
+        });
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
